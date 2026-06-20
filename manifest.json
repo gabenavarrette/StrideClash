@@ -1,0 +1,21 @@
+{
+  "name": "StrideClash PWA",
+  "short_name": "StrideClash",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192/1e1e1e/00e676?text=SC&font=sans",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://placehold.co/512x512/1e1e1e/00e676?text=StrideClash&font=sans",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
