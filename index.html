@@ -342,6 +342,21 @@
         // Refresh values smoothly in background
         setInterval(renderLeaderboard, 60000); // Clock tick
         setInterval(fetchLiveSteps, 300000);    // Pull DB every 5 mins
+
+        // Link App Manifest file context
+const manifestLink = document.createElement('link');
+manifestLink.rel = 'manifest';
+manifestLink.href = 'manifest.json';
+document.head.appendChild(manifestLink);
+
+// Register Background Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+            .catch(err => console.error('Service Worker registration failed:', err));
+    });
+}
     </script>
 </body>
 </html>
