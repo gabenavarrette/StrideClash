@@ -164,7 +164,7 @@
 
         function fetchLiveSteps() {
             const indicator = document.getElementById('status-indicator');
-            if (AS_WEB_APP_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+            if (AS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxj5VsFkbUYmi1u0Mxh-_qj5g8r5X4ETGQnvb2tTwIjWSc6BzAwJfeQXwnoT2LCieThDw/exec') {
                 indicator.innerText = "Demo Mode";
                 userSteps = { daily: 4500, weekly: 28000, monthly: 112000 };
                 renderLeaderboard();
@@ -184,7 +184,7 @@
             const indicator = document.getElementById('status-indicator');
             indicator.innerText = "Saving...";
 
-            if (AS_WEB_APP_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+            if (AS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxj5VsFkbUYmi1u0Mxh-_qj5g8r5X4ETGQnvb2tTwIjWSc6BzAwJfeQXwnoT2LCieThDw/exec') {
                 userSteps.daily = stepsValue;
                 indicator.innerText = "Demo Saved";
                 renderLeaderboard();
