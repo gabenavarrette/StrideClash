@@ -54,7 +54,6 @@
         .step-count { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
         .user-row.self .step-count { color: var(--accent-green); }
 
-        /* Input Deck styling */
         .input-bar { padding: 16px; border-top: 1px solid var(--border-color); background-color: var(--bg-card); display: flex; gap: 8px; }
         .step-input { flex: 1; background-color: #121212; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: white; font-size: 1rem; font-weight: 600; text-align: center; }
         .step-input:focus { border-color: var(--accent-green); outline: none; }
@@ -84,15 +83,17 @@
     </div>
 
     <script>
-        // PASTE YOUR DEPLOYED WEB APP URL HERE
+        // SINGLE POINT ENTRY: Paste your deployed Web App URL here
         const AS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxj5VsFkbUYmi1u0Mxh-_qj5g8r5X4ETGQnvb2tTwIjWSc6BzAwJfeQXwnoT2LCieThDw/exec';
 
         let currentView = 'daily';
         let userSteps = { daily: 0, weekly: 0, monthly: 0 };
         let npcList = [];
 
-        const prefixes = ['Swift', 'Hyper', 'Zenith', 'Apex', 'Cyber', 'Urban', 'Wild', 'Shadow', 'Neon', 'Eco', 'Vortex', 'Solar', 'Alpha', 'Quantum'];
-        const roots = ['Walker', 'Strider', 'Hiker', 'Runner', 'Pacer', 'Tracker', 'Cruiser', 'Rambler', 'Rover', 'Nomad', 'Stepper'];
+        // Expanded nomenclature matrices to unlock thousands of clean variations
+        const prefixes = ['Swift', 'Hyper', 'Zenith', 'Apex', 'Cyber', 'Urban', 'Wild', 'Shadow', 'Neon', 'Eco', 'Vortex', 'Solar', 'Alpha', 'Quantum', 'Volt', 'Pace', 'Blaze', 'Sonic', 'Aero', 'Titan'];
+        const roots = ['Walker', 'Strider', 'Hiker', 'Runner', 'Pacer', 'Tracker', 'Cruiser', 'Rambler', 'Rover', 'Nomad', 'Stepper', 'Chaser', 'Bounder', 'Trekker', 'Glider'];
+        
         const archetypes = [
             { type: 'Chill', baseDaily: 5500, start: 9, end: 21 },
             { type: 'Steady', baseDaily: 9000, start: 8, end: 20 },
@@ -100,28 +101,51 @@
             { type: 'Elite', baseDaily: 18500, start: 5, end: 22 }
         ];
 
+        // Seeded random number generator based on the calendar day
+        function seededRandom(seed) {
+            const x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
         function generateNPCs(count) {
             const pool = [];
-            const daySeed = new Date().getDate();
+            const allCombinations = [];
+            
+            // 1. Compile every possible prefix + root username pair combo
+            for (let p of prefixes) {
+                for (let r of roots) {
+                    allCombinations.push(p + r);
+                }
+            }
+
+            // 2. Use our daily calendar seed to uniformly mix the user deck via Fisher-Yates
+            let currentSeed = new Date().getDate() + new Date().getMonth() * 31;
+            
+            for (let i = allCombinations.length - 1; i > 0; i--) {
+                const rIndex = Math.floor(seededRandom(currentSeed++) * (i + 1));
+                const temp = allCombinations[i];
+                allCombinations[i] = allCombinations[rIndex];
+                allCombinations[rIndex] = temp;
+            }
+
+            // 3. Take the top unique handles and build the specific competitor behaviors
             for (let i = 0; i < count; i++) {
-                const pseudoRand1 = Math.abs(Math.sin(daySeed + i));
-                const pseudoRand2 = Math.abs(Math.sin(daySeed * 2 + i));
-                const pseudoRand3 = Math.abs(Math.sin(daySeed * 3 + i));
+                const uniqueName = `${allCombinations[i]}${Math.floor(10 + seededRandom(currentSeed++) * 89)}`;
+                const profileRand = seededRandom(currentSeed++);
 
-                const pref = prefixes[Math.floor(pseudoRand1 * prefixes.length)];
-                const root = roots[Math.floor(pseudoRand2 * roots.length)];
-                const username = `${pref}${root}${Math.floor(10 + pseudoRand3 * 89)}`;
-
-                let arch = archetypes[1]; 
-                if (pseudoRand1 < 0.15) arch = archetypes[0];
-                else if (pseudoRand1 > 0.85) arch = archetypes[3];
-                else if (pseudoRand1 > 0.55) arch = archetypes[2];
+                let arch = archetypes[1]; // default steady
+                if (profileRand < 0.15) arch = archetypes[0];
+                else if (profileRand > 0.85) arch = archetypes[3];
+                else if (profileRand > 0.55) arch = archetypes[2];
 
                 pool.push({
-                    username: username, baseDaily: arch.baseDaily, startHour: arch.start, endHour: arch.end,
-                    dailySeed: 0.70 + (pseudoRand1 * 0.70),
-                    weeklySeed: 0.85 + (pseudoRand2 * 0.30),
-                    monthlySeed: 0.92 + (pseudoRand3 * 0.16)
+                    username: uniqueName,
+                    baseDaily: arch.baseDaily,
+                    startHour: arch.start,
+                    endHour: arch.end,
+                    dailySeed: 0.70 + (seededRandom(currentSeed++) * 0.70),
+                    weeklySeed: 0.85 + (seededRandom(currentSeed++) * 0.30),
+                    monthlySeed: 0.92 + (seededRandom(currentSeed++) * 0.16)
                 });
             }
             return pool;
@@ -141,7 +165,8 @@
         function renderLeaderboard() {
             const container = document.getElementById('leaderboard');
             container.innerHTML = '';
-            let scoreboard = [{ name: 'You (Ali)', steps: userSteps[currentView], isSelf: true }];
+            // USER CONTEXT NAME SET TO GABE
+            let scoreboard = [{ name: 'You (Gabe)', steps: userSteps[currentView], isSelf: true }];
 
             npcList.forEach(npc => { scoreboard.push({ name: npc.username, steps: calculateSteps(npc, currentView), isSelf: false }); });
             scoreboard.sort((a, b) => b.steps - a.steps);
@@ -166,7 +191,8 @@
             const indicator = document.getElementById('status-indicator');
             if (AS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxj5VsFkbUYmi1u0Mxh-_qj5g8r5X4ETGQnvb2tTwIjWSc6BzAwJfeQXwnoT2LCieThDw/exec') {
                 indicator.innerText = "Demo Mode";
-                userSteps = { daily: 4500, weekly: 28000, monthly: 112000 };
+                const savedDaily = localStorage.getItem('demo_steps_daily') || 0;
+                userSteps = { daily: parseInt(savedDaily), weekly: 28000 + parseInt(savedDaily), monthly: 112000 + parseInt(savedDaily) };
                 renderLeaderboard();
                 return;
             }
@@ -186,8 +212,10 @@
 
             if (AS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxj5VsFkbUYmi1u0Mxh-_qj5g8r5X4ETGQnvb2tTwIjWSc6BzAwJfeQXwnoT2LCieThDw/exec') {
                 userSteps.daily = stepsValue;
+                localStorage.setItem('demo_steps_daily', stepsValue);
                 indicator.innerText = "Demo Saved";
-                renderLeaderboard();
+                inputField.value = '';
+                fetchLiveSteps();
                 return;
             }
 
@@ -201,7 +229,7 @@
         fetchLiveSteps();
         setInterval(renderLeaderboard, 60000);
 
-        // PWA Linking
+        // PWA Configuration linkages
         const manifestLink = document.createElement('link'); manifestLink.rel = 'manifest'; manifestLink.href = 'manifest.json'; document.head.appendChild(manifestLink);
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js'); }); }
     </script>
